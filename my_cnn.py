@@ -9,14 +9,12 @@ from tensorflow.contrib.learn.python.learn.estimators import model_fn as model_f
 tf.logging.set_verbosity(tf.logging.INFO)
 
 def read_img(data_dir, batch_size, shuffle):
-    # Reads pfathes of images together with their labels
     def input_fn():
         image_list, label_list = read_labeled_image_list(data_dir)
 
         images = tf.convert_to_tensor(image_list, dtype=tf.string)
         labels = tf.convert_to_tensor(label_list, dtype=tf.int32)
 
-        # Makes an input_leaves queue
         input_queue = tf.train.slice_input_producer([images, labels],
                                                     shuffle=shuffle,
                                                     capacity=batch_size * 5,
@@ -27,7 +25,7 @@ def read_img(data_dir, batch_size, shuffle):
         # resize image
         image = tf.image.resize_images(image, (200, 200), tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
-        # Image and Label Batching
+        # batch image and label to queue
         image_batch, label_batch = tf.train.batch([image, label], batch_size=batch_size, capacity=batch_size * 10,
                                                   num_threads=1, name="batch_queue",
                                                   allow_smaller_final_batch=True)
@@ -59,7 +57,6 @@ def cnn_model_fn(features, labels, mode, params):
     # Pooling Layer #1
     pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
-    # Convolutional Layer #2 and Pooling Layer #2
     conv2 = tf.layers.conv2d(
         inputs=pool1,
         filters=64,
@@ -68,7 +65,6 @@ def cnn_model_fn(features, labels, mode, params):
         activation=tf.nn.relu)
     pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
-    # Convolutional Layer #3 and Pooling Layer #3
     conv3 = tf.layers.conv2d(
         inputs=pool2,
         filters=64,
@@ -80,15 +76,16 @@ def cnn_model_fn(features, labels, mode, params):
     # Dense Layer
     pool_flat = tf.reshape(pool3, [-1, 25 * 25 * 64])
     dense = tf.layers.dense(inputs=pool_flat, units=512, activation=tf.nn.relu)
+    # drop some data
     dropout = tf.layers.dropout(inputs=dense, rate=params['drop_out_rate'], training=mode == learn.ModeKeys.TRAIN)
 
-    # Logits Layer
+    # map to output
     logits = tf.layers.dense(inputs=dropout, units=32)
 
     loss = None
     train_op = None
 
-    # Calculate Loss (for both TRAIN and EVAL modes)
+    #cal loss
     if mode != learn.ModeKeys.INFER:
         onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=32, name="onehot")
         loss = tf.losses.softmax_cross_entropy(
