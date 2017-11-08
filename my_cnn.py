@@ -145,7 +145,7 @@ def my_signature_fn(examples,features,predictions):
 if __name__ == '__main__':
     params = {'drop_out_rate': 0.2, 'learning_rate': 0.00001}
     cnn_classifier = learn.Estimator(
-        model_fn=cnn_model_fn, model_dir="_leaf_model_2conv_256dense_1000_steps_with_hook/plain_cnn",
+        model_fn=cnn_model_fn, model_dir="my_cnn_model_exported",
         config=RunConfig(save_summary_steps=10, keep_checkpoint_max=2, save_checkpoints_secs=30),
         feature_engineering_fn=feature_engineering_fn, params=params)
     # Configure the accuracy metric for evaluation
@@ -166,7 +166,7 @@ if __name__ == '__main__':
                                                     metrics=metrics,
                                                     name='validation')
     hook = monitors.replace_monitors_with_hooks([validation_monitor],cnn_classifier)
-    cnn_classifier.fit(input_fn=train_input_fn, steps=5000, monitors=[validation_monitor])
+    cnn_classifier.fit(input_fn=train_input_fn, steps=1000, monitors=[validation_monitor])
     # prediction = cnn_classifier.predict(input_fn=predict_input_fn)
     # y = list(itertools.islice(prediction,6))
     # x = 1r
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     #     print("Input : ", x , "  Output: ",i['classes']+1," : ",max(i['probabilities']))
     #     x+= 1
 
-
+    cnn_classifier.export("model_my_cnn_2/")
     # Evaluate the _model and print results
     eval_results = cnn_classifier.evaluate(input_fn=test_input_fn, metrics=metrics, steps=1,hooks=hook)
     np.save(os.getcwd() + '/embedding1.npy', eval_results['dense'])
