@@ -9,11 +9,15 @@ output_labels =['0','1','2','3','4','5','6','7',
                 '27','28','29','30','31']
 
 
-coreml_model = coreml.converters.keras.convert('keras_model.h5',
+coreml_model = coreml.converters.keras.convert('keras_model_3.h5',
                                                input_names="image",
                                                image_input_names='image',
                                                output_names='output',
                                                class_labels=output_labels,
                                                image_scale=1/255.)
 
-coreml_model.save('keras_coreml.mlmodel')
+coreml_model.author = "Kajornsak Peerapathananont"
+coreml_model.license = "MIT"
+coreml_model.description = "LeafAI : Leaf classification with Deep Learning"
+
+coreml_model.save('keras_coreml_3.mlmodel')

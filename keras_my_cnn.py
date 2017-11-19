@@ -40,24 +40,10 @@ input_shape = (400,300,3)
 # model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 #
 model = Sequential([
-    Conv2D(64, (3, 3), input_shape=input_shape, padding='same',
+    Conv2D(32, (3, 3), input_shape=input_shape, padding='same',
            activation='relu'),
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
     Conv2D(64, (3, 3), activation='relu', padding='same'),
-    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
-    Conv2D(128, (3, 3), activation='relu', padding='same'),
-    Conv2D(128, (3, 3), activation='relu', padding='same',),
-    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
-    Conv2D(256, (3, 3), activation='relu', padding='same',),
-    Conv2D(256, (3, 3), activation='relu', padding='same',),
-    Conv2D(256, (3, 3), activation='relu', padding='same',),
-    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
-    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
-    Conv2D(512, (3, 3), activation='relu', padding='same',),
     MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
     Flatten(),
     Dense(256, activation='relu'),
@@ -84,9 +70,9 @@ model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accurac
 model.fit_generator(
     train_generator,
     steps_per_epoch=30,
-    epochs=1,
+    epochs=50,
     validation_data=validation_generator,
     validation_steps=800 // batch_size
 )
-model.save('keras_model_2.h5')
+model.save('keras_model_3.h5')
 # model.summary()
